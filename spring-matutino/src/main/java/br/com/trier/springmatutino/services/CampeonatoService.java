@@ -11,6 +11,8 @@ public interface CampeonatoService {
 	Campeonato findById(Integer id);
 	Campeonato update(Campeonato campeonato);
     void delete(Integer id);
-	List<Campeonato> findByDescricao(String descricao);
-    
+	List<Campeonato> findByDescricaoContainsIgnoreCase(String descricao);
+	List<Campeonato> findByDescricaoContainsIgnoreCaseAndAnoEquals(String descricao,Integer ano);
+	List<Campeonato> findByAno(Integer ano);
+	List<Campeonato> findByAnoBetween(Integer anoInicial, Integer anoFinal);
 }

@@ -28,6 +28,6 @@ public class Campeonato {
 	private String descricao;
 	
 	@Column(name = "ano_campeonato")
-	private int ano;
+	private Integer ano;
 
 }

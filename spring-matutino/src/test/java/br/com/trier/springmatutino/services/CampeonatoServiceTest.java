@@ -33,6 +33,15 @@ public class CampeonatoServiceTest extends BaseTests{
 	}
 	
 	@Test
+	@DisplayName("Teste buscar campeonato por ano")
+	@Sql({"classpath:/resources/sqls/campeonato.sql"})
+	void findByYearTest() {
+		List<Campeonato> campeonato = campeonatoService.findByAno(2000);
+		assertThat(campeonato).isNotNull();
+		assertEquals(2000, campeonato);
+	}
+	
+	@Test
 	@DisplayName("Teste buscar campeonato por ID inexistente")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void findByIdNonExistentTest() {
@@ -90,9 +99,9 @@ public class CampeonatoServiceTest extends BaseTests{
 	@DisplayName("Teste procurar campeonato que começa com")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void findCampeonatoNameStatsWithTest() {
-		List <Campeonato> lista = campeonatoService.findByDescricao("Campeonato 2");
+		List <Campeonato> lista = campeonatoService.findByDescricaoContainsIgnoreCase("Campeonato 2");
 		assertEquals(1,lista.size());
-		lista = campeonatoService.findByDescricao("c");
+		lista = campeonatoService.findByDescricaoContainsIgnoreCase("x");
 		assertEquals(0,lista.size());
 	}
 	
