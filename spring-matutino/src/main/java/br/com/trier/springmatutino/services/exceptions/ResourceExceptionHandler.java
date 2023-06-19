@@ -25,5 +25,5 @@ public class ResourceExceptionHandler {
 		StandardError erro= new StandardError(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(), ex.getMessage(),request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
 	}
-
+	
 }
