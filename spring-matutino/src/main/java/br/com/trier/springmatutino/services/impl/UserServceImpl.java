@@ -35,6 +35,7 @@ public class UserServceImpl implements UserService {
 
 	@Override
 	public List<User> listAll() {
+		//FIXME tratar excessao obj não encontrado
 
 		return repository.findAll();
 	}
@@ -47,15 +48,23 @@ public class UserServceImpl implements UserService {
 
 	@Override
 	public User update(User user) {
-		findByEmail(user);
-		return repository.save(user);
+	    User existingUser = findById(user.getId());
+	    findByEmail(user);
+	    if (existingUser == null) {
+	        throw new ObjetoNaoEncontrado("Usuário %s não encontrado".formatted(user.getId()));
+	    }
+	    
+	    return repository.save(user);
 	}
 
 
 	@Override
 	public void delete(Integer id) {
-		User user = findById(id);
-		repository.delete(user);	
+	    User existingUser = findById(id);
+	    if (existingUser == null) {
+	        throw new ObjetoNaoEncontrado("Usuário %s não encontrado".formatted(id));
+	    }
+	    repository.delete(existingUser);
 	}
 
 

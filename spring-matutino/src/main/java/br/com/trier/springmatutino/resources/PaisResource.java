@@ -38,7 +38,7 @@ public class PaisResource {
 	
 	@GetMapping("/name/{name}")
 	public ResponseEntity<List<Pais>> buscarPorNome(@PathVariable String name){
-		List<Pais> lista = service.findByNameIgnoreCase(name);
+		List<Pais> lista = service.findByName(name);
 		return lista.size()>0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
 	}
 	
