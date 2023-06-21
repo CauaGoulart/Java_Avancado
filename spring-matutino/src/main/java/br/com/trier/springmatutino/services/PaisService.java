@@ -9,7 +9,7 @@ public interface PaisService {
     Pais salvar (Pais pais);
 	List<Pais> listAll();
 	Pais findById(Integer id);
-	List<Pais> findByName(String name);
+	List<Pais> findByNameIgnoreCase(String name);
 	Pais update(Pais pais);
     void delete(Integer id);
 

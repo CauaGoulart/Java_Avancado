@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import br.com.trier.springmatutino.domain.Campeonato;
 import br.com.trier.springmatutino.repositories.CampeonatoRepository;
 import br.com.trier.springmatutino.services.CampeonatoService;
+import br.com.trier.springmatutino.services.exceptions.ObjetoNaoEncontrado;
+import br.com.trier.springmatutino.services.exceptions.ViolacaoIntegridade;
 
 @Service
 public class CampeonatoServiceImpl implements CampeonatoService{
@@ -18,10 +20,14 @@ public class CampeonatoServiceImpl implements CampeonatoService{
 
 	@Override
 	public Campeonato salvar(Campeonato campeonato) {
-		return repository.save(campeonato);
-	}
 
-	
+		    int ano = campeonato.getAno();
+		    if (ano < 1990 || ano > 2024) {
+		        throw new ViolacaoIntegridade("O ano do campeonato deve estar entre 1990 e 2023");
+		    }
+		    return repository.save(campeonato);
+		}
+	@Override
 	public List<Campeonato> listAll() {
 		return repository.findAll();
 	}
@@ -29,7 +35,7 @@ public class CampeonatoServiceImpl implements CampeonatoService{
 	@Override
 	public Campeonato findById(Integer id) {
 		Optional<Campeonato> obj = repository.findById(id);
-		return obj.orElse(null);
+		return obj.orElseThrow(() -> new ObjetoNaoEncontrado("Campeonato %s não encontrado".formatted(id)));
 	}
 
 	@Override
@@ -39,36 +45,34 @@ public class CampeonatoServiceImpl implements CampeonatoService{
 
 	@Override
 	public void delete(Integer id) {
-		Campeonato user = findById(id);
-		if (user != null) {
-			repository.delete(user);
-		}
-
+		Campeonato campeonato = findById(id);
+		repository.delete(campeonato);
 	}
-
 
 	@Override
-	public List<Campeonato> findByDescricaoContainsIgnoreCase(String descricao) {
-		return repository.findByDescricaoContainsIgnoreCase(descricao);
-	}
+	public List<Campeonato> findByDescricaoContainsIgnoreCase(String name) {
+		List<Campeonato> lista = repository.findByDescricaoContainsIgnoreCase(name);
+		if (lista.size() == 0) {
+			throw new ObjetoNaoEncontrado("Nenhum nome de campeonato inicia com %s".formatted(name));
+		}
+		return repository.findByDescricaoContainsIgnoreCase(name);
 
+	}
 
 	@Override
 	public List<Campeonato> findByDescricaoContainsIgnoreCaseAndAnoEquals(String descricao, Integer ano) {
-		return repository.findByDescricaoContainsIgnoreCaseAndAnoEquals(descricao,ano);
-
+	    return repository.findByDescricaoContainsIgnoreCaseAndAnoEquals(descricao, ano);
 	}
 
 	@Override
 	public List<Campeonato> findByAno(Integer ano) {
-		return repository.findByAno(ano);
-
+	    return repository.findByAno(ano);
 	}
-
 
 	@Override
 	public List<Campeonato> findByAnoBetween(Integer anoInicial, Integer anoFinal) {
-		return repository.findByAnoBetween(anoInicial, anoFinal);
+	    return repository.findByAnoBetween(anoInicial, anoFinal);
 	}
+
 
 }

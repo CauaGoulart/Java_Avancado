@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.trier.springmatutino.domain.Campeonato;
+import br.com.trier.springmatutino.domain.dto.CampeonatoDTO;
 import br.com.trier.springmatutino.services.CampeonatoService;
 
 @RestController
@@ -25,67 +26,48 @@ public class CampeonatoResource {
 
 	@PostMapping
 	public ResponseEntity<Campeonato> insert(@RequestBody Campeonato campeonato) {
-		Campeonato newCampeonato = service.salvar(campeonato);
-		return newCampeonato != null ? ResponseEntity.ok(newCampeonato) : ResponseEntity.badRequest().build();
-	}
+		return ResponseEntity.ok(service.salvar(campeonato));	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Campeonato> buscaPorCodigo(@PathVariable Integer id) {
-		Campeonato Campeonato = service.findById(id);
-		return Campeonato != null ? ResponseEntity.ok(Campeonato) : ResponseEntity.noContent().build();
-
+	public ResponseEntity<CampeonatoDTO> buscaPorCodigo(@PathVariable Integer id) {
+		Campeonato campeonato = service.findById(id);
+		 return ResponseEntity.ok(campeonato.toDto());	
 	}
 	
-	@GetMapping("/descricao/{descricao}")
-	public ResponseEntity<List<Campeonato>> findByDescricao(@PathVariable String descricao) {
-		List<Campeonato> lista = service.findByDescricaoContainsIgnoreCase(descricao);
-		return lista.size() > 0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-
-
-	}
-
-
-	@GetMapping("/descricao-ano/{descricao}/{ano}")
-	public ResponseEntity<List<Campeonato>> findByDescricaoEAno(@PathVariable String descricao,@PathVariable Integer ano) {
-		List<Campeonato> lista = service.findByDescricaoContainsIgnoreCaseAndAnoEquals(descricao, ano);
-		return lista.size() > 0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-
-
-	}
-
-	@GetMapping("/ano/{ano}")
-	public ResponseEntity<List<Campeonato>> findByAno(@PathVariable Integer ano) {
-		List<Campeonato> lista = service.findByAno(ano);
-		return lista.size() > 0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-
-
-	}
+	 @GetMapping("/name/{name}")
+		public ResponseEntity<List<CampeonatoDTO>> buscarPorNome(@PathVariable String name){
+	        return ResponseEntity.ok(service.findByDescricaoContainsIgnoreCase(name).stream().map((user) -> user.toDto()).toList());
+		}
 	
-	@GetMapping("/ano-entre/{anoInicial}/{anoFinal}")
-	public ResponseEntity<List<Campeonato>> findByAno(@PathVariable Integer anoInicial,@PathVariable Integer anoFinal) {
-		List<Campeonato> lista = service.findByAnoBetween(anoInicial, anoFinal);
-		return lista.size() > 0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-
-
-	}
-
-	@GetMapping
-	public ResponseEntity<List<Campeonato>> listaTodos() {
-		List<Campeonato> lista = service.listAll();
-		return lista.size() > 0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-	}
-
-	@PutMapping("/{id}")
+    @GetMapping
+	public ResponseEntity<List<CampeonatoDTO>> listaTodos(){
+        return ResponseEntity.ok(service.listAll().stream().map((campeonato) -> campeonato.toDto()).toList());
+}
+    
+    @PutMapping("/{id}")
 	public ResponseEntity<Campeonato> update(@PathVariable Integer id, @RequestBody Campeonato campeonato) {
-		campeonato.setId(id);
-		campeonato = service.update(campeonato);
-		return campeonato != null ? ResponseEntity.ok(campeonato) : ResponseEntity.badRequest().build();
-	}
-
-	@DeleteMapping("/{id}")
+    	return ResponseEntity.ok(service.update(campeonato));
+}
+    
+    @DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
-		service.delete(id);
-		return ResponseEntity.ok().build();
+    	service.delete(id);
+    	return ResponseEntity.ok().build();
 	}
 
+    @GetMapping("/ano/{ano}")
+    public ResponseEntity<List<Campeonato>> findByAno(@PathVariable Integer ano) {
+    	return ResponseEntity.ok(service.findByAno(ano));
+    }
+
+    @GetMapping("/ano/{ano1}/{ano2}")
+    public ResponseEntity<List<Campeonato>> findByAnoBetween(@PathVariable Integer ano1, @PathVariable Integer ano2) {
+    	return ResponseEntity.ok(service.findByAnoBetween(ano1, ano2));
+    }
+    
+    @GetMapping("/descricao-ano/{descricao}/{ano}")
+    public ResponseEntity<List<Campeonato>> findByDescricaoIgnoreCaseAndAnoEquals(@PathVariable String descricao, @PathVariable Integer ano) {
+    	return ResponseEntity.ok(service.findByDescricaoContainsIgnoreCaseAndAnoEquals(descricao, ano));
+    }
+    
 }

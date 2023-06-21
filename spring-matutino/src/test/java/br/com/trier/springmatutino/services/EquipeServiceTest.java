@@ -2,6 +2,7 @@ package br.com.trier.springmatutino.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import br.com.trier.springmatutino.BaseTests;
 import br.com.trier.springmatutino.domain.Equipe;
+import br.com.trier.springmatutino.services.exceptions.ObjetoNaoEncontrado;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -34,8 +36,8 @@ public class EquipeServiceTest extends BaseTests{
 	@DisplayName("Teste buscar equipe por ID inexistente")
 	@Sql({"classpath:/resources/sqls/equipe.sql"})
 	void findByIdNonExistentTest() {
-		Equipe equipe = equipeService.findById(10);
-		assertThat(equipe).isNull();
+		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> equipeService.findById(10));
+		assertEquals("Equipe 10 não encontrado", exception.getMessage());
 		
 	}
 	
@@ -56,7 +58,6 @@ public class EquipeServiceTest extends BaseTests{
 		user = equipeService.findById(1);
 		assertEquals(1, user.getId());
 		assertEquals("nome", user.getName());
-
 	}
 	
 	@Test
@@ -69,7 +70,6 @@ public class EquipeServiceTest extends BaseTests{
 		assertThat(equipe).isNotNull();
 		assertEquals(1, equipe.getId());
 		assertEquals("altera", equipe.getName());
-
 	}
 	
 	@Test
@@ -80,28 +80,24 @@ public class EquipeServiceTest extends BaseTests{
 		List<Equipe> lista = equipeService.listAll();
 		assertEquals(1,lista.size());
 		assertEquals(2,lista.get(0).getId());
-
 	}
 	
 	@Test
 	@DisplayName("Teste procurar equipe que começa com")
 	@Sql({"classpath:/resources/sqls/equipe.sql"})
 	void findEquipeNameStatsWithTest() {
-		List <Equipe> lista = equipeService.findByName("Equipe 2");
+		List <Equipe> lista = equipeService.findByNameIgnoreCase("Equipe 2");
 		assertEquals(1,lista.size());
-		lista = equipeService.findByName("c");
-		assertEquals(0,lista.size());
+	
+		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> equipeService.findByNameIgnoreCase("x"));
+		assertEquals("Nenhum nome de equipe inicia com x", exception.getMessage());
 	}
 	
 	@Test
 	@DisplayName("Teste deletar equipe inexistente")
 	@Sql({ "classpath:/resources/sqls/equipe.sql" })
 	void deleteNonExistentUserTest() {
-		equipeService.delete(10);
-		List<Equipe> lista = equipeService.listAll();
-		assertEquals(2, lista.size());
-		assertEquals(1, lista.get(0).getId());
-		assertEquals(2, lista.get(1).getId());
-
+		  var exception = assertThrows(ObjetoNaoEncontrado.class, () -> equipeService.delete(10));
+		    assertEquals("Equipe 10 não encontrado", exception.getMessage());
 	}
 }

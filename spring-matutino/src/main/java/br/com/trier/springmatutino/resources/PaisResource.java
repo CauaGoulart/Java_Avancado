@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.trier.springmatutino.domain.Pais;
+import br.com.trier.springmatutino.domain.dto.PaisDTO;
 import br.com.trier.springmatutino.services.PaisService;
 
 @RestController
@@ -25,34 +26,28 @@ public class PaisResource {
 
 	@PostMapping
 	public ResponseEntity<Pais> insert(@RequestBody Pais pais) {
-		Pais newPais = service.salvar(pais);
-		return newPais != null ? ResponseEntity.ok(newPais) : ResponseEntity.badRequest().build();
-	}
+		return ResponseEntity.ok(service.salvar(pais));	
+		}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Pais> buscaPorCodigo(@PathVariable Integer id) {
+	public ResponseEntity<PaisDTO> buscaPorCodigo(@PathVariable Integer id) {
 		Pais pais = service.findById(id);
-		return pais != null ? ResponseEntity.ok(pais) : ResponseEntity.noContent().build();
-
+		 return ResponseEntity.ok(pais.toDto());	
 	}
 	
-	@GetMapping("/name/{name}")
-	public ResponseEntity<List<Pais>> buscarPorNome(@PathVariable String name){
-		List<Pais> lista = service.findByName(name);
-		return lista.size()>0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-	}
+	 @GetMapping("/name/{name}")
+		public ResponseEntity<List<Pais>> buscarPorNome(@PathVariable String name){
+	        return ResponseEntity.ok(service.findByNameIgnoreCase(name).stream().map((user) -> user).toList());
+		}
 	
     @GetMapping
-	public ResponseEntity<List<Pais>> listaTodos(){
-		List<Pais> lista = service.listAll();
-		return lista.size()>0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-	}
+	public ResponseEntity<List<PaisDTO>> listaTodos(){
+        return ResponseEntity.ok(service.listAll().stream().map((pais) -> pais.toDto()).toList());
+}
     
     @PutMapping("/{id}")
-	public ResponseEntity<Pais> update(@PathVariable Integer id, @RequestBody Pais pais) {
-    	pais.setId(id);
-    	pais = service.update(pais);
-		return pais != null ? ResponseEntity.ok(pais) : ResponseEntity.badRequest().build();
+    public ResponseEntity<Pais> update(@PathVariable Integer id, @RequestBody Pais pais){
+		return ResponseEntity.ok(service.update(pais));
 	}
     
     @DeleteMapping("/{id}")

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.trier.springmatutino.domain.Equipe;
+import br.com.trier.springmatutino.domain.dto.EquipeDTO;
 import br.com.trier.springmatutino.services.EquipeService;
 
 @RestController
@@ -24,34 +25,33 @@ public class EquipeResouce {
 	private EquipeService service;
 
 	@PostMapping
-	public ResponseEntity<Equipe> insert(@RequestBody Equipe Equipe) {
-		Equipe newEquipe = service.salvar(Equipe);
-		return newEquipe != null ? ResponseEntity.ok(newEquipe) : ResponseEntity.badRequest().build();
+	public ResponseEntity<Equipe> insert(@RequestBody Equipe equipe) {
+		return ResponseEntity.ok(service.salvar(equipe));
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Equipe> buscaPorCodigo(@PathVariable Integer id) {
-		Equipe Equipe = service.findById(id);
-		return Equipe != null ? ResponseEntity.ok(Equipe) : ResponseEntity.noContent().build();
-
+	public ResponseEntity<EquipeDTO> buscaPorCodigo(@PathVariable Integer id) {
+		Equipe equipe = service.findById(id);
+		 return ResponseEntity.ok(equipe.toDto());	
 	}
-
-	@GetMapping
-	public ResponseEntity<List<Equipe>> listaTodos() {
-		List<Equipe> lista = service.listAll();
-		return lista.size() > 0 ? ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
-	}
-
-	@PutMapping("/{id}")
-	public ResponseEntity<Equipe> update(@PathVariable Integer id, @RequestBody Equipe Equipe) {
-		Equipe.setId(id);
-		Equipe = service.update(Equipe);
-		return Equipe != null ? ResponseEntity.ok(Equipe) : ResponseEntity.badRequest().build();
-	}
-
-	@DeleteMapping("/{id}")
+	
+	 @GetMapping("/name/{name}")
+		public ResponseEntity<List<Equipe>> buscarPorNome(@PathVariable String name){
+		 return ResponseEntity.ok(service.findByNameIgnoreCase(name));		}
+	
+    @GetMapping
+	public ResponseEntity<List<EquipeDTO>> listaTodos(){
+        return ResponseEntity.ok(service.listAll().stream().map((equipe) -> equipe.toDto()).toList());
+}
+    
+    @PutMapping("/{id}")
+	public ResponseEntity<Equipe> update(@PathVariable Integer id, @RequestBody Equipe equipe) {
+    	return ResponseEntity.ok(service.update(equipe));
+}
+    
+    @DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
-		service.delete(id);
-		return ResponseEntity.ok().build();
+    	service.delete(id);
+    	return ResponseEntity.ok().build();
 	}
 }
