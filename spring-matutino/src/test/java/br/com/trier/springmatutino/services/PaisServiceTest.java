@@ -47,12 +47,12 @@ public class PaisServiceTest extends BaseTests{
 	@Test
 	@DisplayName("Teste incluir pais")
 	void insertPaisTest() {
-		Pais user = new Pais(null,"nome");
-		paisService.salvar(user);
-		assertThat(user).isNotNull();
-		user = paisService.findById(1);
-		assertEquals(1, user.getId());
-		assertEquals("nome", user.getName());
+		Pais pais = new Pais(null,"nome");
+		paisService.salvar(pais);
+		assertThat(pais).isNotNull();
+		pais = paisService.findById(1);
+		assertEquals(1, pais.getId());
+		assertEquals("nome", pais.getName());
 	}
 	
 	@Test

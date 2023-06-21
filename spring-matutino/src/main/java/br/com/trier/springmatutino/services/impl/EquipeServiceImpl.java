@@ -1,7 +1,6 @@
 package br.com.trier.springmatutino.services.impl;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,7 @@ public class EquipeServiceImpl implements EquipeService{
 
 	@Override
 	public Equipe findById(Integer id) {
-		Optional<Equipe> obj = repository.findById(id);
-		return obj.orElseThrow(() -> new ObjetoNaoEncontrado("Equipe %s não encontrado".formatted(id)));
+		return repository.findById(id).orElseThrow(() -> new ObjetoNaoEncontrado("Equipe com id %s não existe".formatted(id)));
 	}
 
 	@Override

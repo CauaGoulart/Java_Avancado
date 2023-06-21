@@ -108,13 +108,16 @@ public class PaisResourceTest {
 
 	@Test
 	@DisplayName("Buscar pais por nome")
+	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
+	@Sql(scripts = "classpath:/resources/sqls/pais.sql")
 	public void testGetpaisByName() {
-		ResponseEntity<Pais> response = getpais("/pais/name/Pais 1");
-		assertEquals(response.getStatusCode(), HttpStatus.OK);
-		
-		Pais pais = response.getBody();
-		assertEquals("Pais 1", pais.getName());
+	    ResponseEntity<Pais> response = getpais("/pais/name/Pais 1");
+	    assertEquals(HttpStatus.OK, response.getStatusCode());
+
+	    Pais pais = response.getBody();
+	    assertEquals("Pais 1", pais.getName());
 	}
+
 
 	@Test
 	@DisplayName("Listar todos os pais")

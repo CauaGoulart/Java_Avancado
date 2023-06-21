@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,7 +25,10 @@ public class Pista {
 	@Setter
 	private Integer id;
 	
-	@Column(name = "tamanho_pista", unique = true)
-	private Double tamanho;
+	@Column(name = "tamanho_pista")
+	private Integer tamanho;
+	
+	@ManyToOne
+	private Pais pais;
 
 }
