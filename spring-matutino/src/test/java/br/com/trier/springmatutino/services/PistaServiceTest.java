@@ -52,8 +52,7 @@ public class PistaServiceTest extends BaseTests{
 	@Test
 	@DisplayName("Teste listar todos")
 	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
-	@Sql({"classpath:/resourcestestes/sqls/pais.sql"})
-	@Sql({"classpath:/resourcestestes/sqls/pista.sql"})
+	@Sql({"classpath:/resources/sqls/pista.sql"})
 	void listAll() {
 		assertEquals(2, service.listAll().size());
 	}

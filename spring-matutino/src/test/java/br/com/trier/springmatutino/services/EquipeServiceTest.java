@@ -37,7 +37,7 @@ public class EquipeServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/equipe.sql"})
 	void findByIdNonExistentTest() {
 		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> equipeService.findById(10));
-		assertEquals("Equipe 10 não encontrado", exception.getMessage());
+		assertEquals("Equipe com id 10 não existe", exception.getMessage());
 		
 	}
 	
@@ -98,6 +98,6 @@ public class EquipeServiceTest extends BaseTests{
 	@Sql({ "classpath:/resources/sqls/equipe.sql" })
 	void deleteNonExistentUserTest() {
 		  var exception = assertThrows(ObjetoNaoEncontrado.class, () -> equipeService.delete(10));
-		    assertEquals("Equipe 10 não encontrado", exception.getMessage());
+		    assertEquals("Equipe com id 10 não existe", exception.getMessage());
 	}
 }

@@ -1,7 +1,5 @@
 package br.com.trier.springmatutino.domain;
 
-import java.time.LocalDateTime;
-
 import br.com.trier.springmatutino.domain.dto.CorridaDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +27,7 @@ public class Corrida {
 	private Integer id;
 	
 	@Column(name = "data_corrida")
-	private LocalDateTime date;
+	private Integer anoCampeonato;
 	
 	@ManyToOne
 	private Pista pista;
@@ -38,11 +36,12 @@ public class Corrida {
 	private Campeonato campeonato;
 
 	public Corrida(CorridaDTO dto) {
-		this(dto.getId(),dto.getDate(),dto.getPista(),dto.getCampeonato());
+	    this(dto.getId(), dto.getAnoCampeonato(), dto.getPista(), dto.getCampeonato());
 	}
 	
 	public CorridaDTO toDto() {
-		return new CorridaDTO(this.id,this.date,this.pista,this.campeonato);
+	    return new CorridaDTO(this.id, this.anoCampeonato, this.pista, this.campeonato);
 	}
+
 
 }

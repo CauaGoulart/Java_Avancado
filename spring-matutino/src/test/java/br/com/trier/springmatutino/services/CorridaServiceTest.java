@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +16,7 @@ import br.com.trier.springmatutino.domain.Pista;
 import br.com.trier.springmatutino.domain.Campeonato;
 import br.com.trier.springmatutino.domain.Corrida;
 import br.com.trier.springmatutino.services.exceptions.ObjetoNaoEncontrado;
+import br.com.trier.springmatutino.services.exceptions.ViolacaoIntegridade;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -59,34 +59,55 @@ public class CorridaServiceTest extends BaseTests{
 	@Test
 	@DisplayName("Teste listar todos")
 	@Sql({"classpath:/resources/sqls/limpa_tabelas_corrida.sql"})
-	@Sql({"classpath:/resourcestestes/sqls/campeonato.sql"})
-	@Sql({"classpath:/resourcestestes/sqls/corrida.sql"})
+	@Sql({"classpath:/resources/sqls/corrida.sql"})
 	void listAll() {
-		var lista = service.listAll();
-		assertEquals(2, lista.size());
+		assertEquals(2, service.listAll().size());
 	}
 	
 	@Test
-	@DisplayName("Teste cadastrar corrida")
-	void salvar() {
-		LocalDateTime date = LocalDateTime.now();
-		Corrida corrida = new Corrida(null, date , new Pista(1, null, null), new Campeonato(1, null, null));
-		service.salvar(corrida);
-		assertThat(corrida).isNotNull();
-		assertEquals(1, corrida.getId());
-
+	@DisplayName("Teste listar vazio")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas_corrida.sql"})
+	void listAllMissing() {
+		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> service.listAll());
+		assertEquals("Nenhuma corrida listada", exception.getMessage());
 	}
 	
+		@Test
+		@DisplayName("Teste cadastrar corrida")
+		void salvar() {
+			    Pista pista = new Pista(null, null, null);
+			    Campeonato campeonato = new Campeonato(null, "nome", 2000);
+			    Integer date = campeonato.getAno();
+			    Corrida corrida = new Corrida(2, date, pista, campeonato);
+			    service.salvar(corrida);
+
+			    assertThat(corrida).isNotNull();
+			    assertEquals(2, corrida.getId());
+		}
+		
+		@Test
+		@DisplayName("Teste validarCorrida - Ano do campeonato nulo")
+		void validarCorridaAnoCampeonatoNulo() {
+		    Pista pista = new Pista(null, null, null);
+		    Corrida corrida = new Corrida(2, null, pista, null);
+
+		    var exception = assertThrows(ViolacaoIntegridade.class, () -> service.salvar(corrida));
+		    assertEquals("Data não pode estar vazia.", exception.getMessage());
+		}
+
+
+
 	@Test
 	@DisplayName("Teste update no corrida")
 	@Sql({"classpath:/resources/sqls/limpa_tabelas_corrida.sql"})
 	
 	@Sql({"classpath:/resources/sqls/corrida.sql"})
 	void updateCorrida() {
-		LocalDateTime date = LocalDateTime.now();
-		Corrida corrida = new Corrida(null, date , new Pista(1, null, null), new Campeonato(1, null, null));
+		Campeonato campeonato = new Campeonato(1, "nome", 2000);
+	    Integer date = campeonato.getAno();
+		Corrida corrida = new Corrida(2, date , new Pista(1, null, null), campeonato);
 		service.salvar(corrida);
-		assertEquals(1, corrida.getId());
+		assertEquals(2, corrida.getId());
 	}
 	
 	@Test
@@ -113,15 +134,15 @@ public class CorridaServiceTest extends BaseTests{
 	}
 	
 	@Test
-	@DisplayName("Teste buscar corrida por nome")
+	@DisplayName("Teste buscar corrida por data")
 	@Sql({"classpath:/resources/sqls/limpa_tabelas_corrida.sql"})
-	
 	@Sql({"classpath:/resources/sqls/corrida.sql"})
-	void findByName() {
-		LocalDateTime date = LocalDateTime.parse("2023-09-14T12:34:00");
-		List<Corrida> lista = service.findByDate(date);
-		assertEquals(2, lista.size());
+	void findByDate() {
+		 Integer date = 2005;
+	    List<Corrida> lista = service.findByAnoCampeonato(date);
+	    assertEquals(1, lista.size());
 	}
+
 	
 	@Test
 	@DisplayName("Teste buscar corrida por data inexistente")
@@ -129,8 +150,8 @@ public class CorridaServiceTest extends BaseTests{
 	
 	@Sql({"classpath:/resources/sqls/corrida.sql"})
 	void findByNameInexistente() {
-		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> service.findByDate(null));
-		assertEquals("Nenhuma corrida entre esses nome ", exception.getMessage());
+		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> service.findByAnoCampeonato(null));
+		assertEquals("Nenhuma corrida nesta data", exception.getMessage());
 	}
 	
 	@Test
@@ -139,7 +160,7 @@ public class CorridaServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/corrida.sql"})
 	void findByPaisTest() {
 		var corridas = service.findByPista(new Pista(1, null, null));
-		assertEquals(2, corridas.size());
+		assertEquals(1, corridas.size());
 	}
 
 	@Test
@@ -168,9 +189,9 @@ public class CorridaServiceTest extends BaseTests{
 	
 	@Sql({"classpath:/resources/sqls/corrida.sql"})
 	void findByPistaTestInexistente() {
-	    Campeonato campeonato = new Campeonato(null,"Inexistente",2000);
+	    Campeonato campeonato = new Campeonato(100,"Inexistente",2000);
 	    var exception = assertThrows(ObjetoNaoEncontrado.class, () -> service.findByCampeonato(campeonato));
-	    assertEquals("Nenhuma corrida na campeonato Inexistente", exception.getMessage());
+	    assertEquals("Nenhuma corrida nesse campeonato", exception.getMessage());
 	}
 	
 }

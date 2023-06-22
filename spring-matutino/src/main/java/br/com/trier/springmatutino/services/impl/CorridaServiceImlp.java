@@ -22,15 +22,17 @@ public class CorridaServiceImlp implements CorridaService {
 	
 	private void validarCorrida(Corrida corrida) {
 		
-		if (corrida.getDate() == null) {
+		if (corrida.getAnoCampeonato() == null) {
 			throw new ViolacaoIntegridade("Data não pode estar vazia.");
 
 		}
 		
-		if (corrida.getDate().isBefore(LocalDateTime.now())) {
-			throw new ViolacaoIntegridade("Data invalida");
+		 int ano = corrida.getAnoCampeonato();
+		    int anoAtual = LocalDateTime.now().getYear();
+		    if (ano < 1990 || ano > anoAtual + 1) {
+		        throw new ViolacaoIntegridade("Data invalida");
+		    }
 
-		}
 	}
 
 	@Override
@@ -56,12 +58,12 @@ public class CorridaServiceImlp implements CorridaService {
 	}
 
 	@Override
-	public List<Corrida> findByDate(LocalDateTime date) {
-		 List<Corrida> lista = repository.findByDate(date);
+	public List<Corrida> findByAnoCampeonato(Integer date) {
+		 List<Corrida> lista = repository.findByAnoCampeonato(date);
  		if(lista.size()==0) {
  			throw new ObjetoNaoEncontrado("Nenhuma corrida nesta data");
  		}
-	return repository.findByDate(date);
+	return repository.findByAnoCampeonato(date);
 
 }
 
@@ -87,10 +89,11 @@ public class CorridaServiceImlp implements CorridaService {
 
 	@Override
 	public Corrida update(Corrida corrida) {
-		findById(corrida.getId());
-        validarCorrida(corrida);
-		return repository.save(corrida);
+	    Corrida existingCorrida = findById(corrida.getId());
+	    validarCorrida(existingCorrida);
+	    return repository.save(existingCorrida);
 	}
+
 
 	@Override
 	public void delete(Integer id) {

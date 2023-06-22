@@ -38,8 +38,8 @@ public class CampeonatoServiceTest extends BaseTests{
 	@DisplayName("Teste buscar campeonato por ID inexistente")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void findByIdNonExistentTest() {
-		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> campeonatoService.findById(10));
-		assertEquals("Campeonato 10 não encontrado", exception.getMessage());
+		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> campeonatoService.findById(100));
+		assertEquals("Campeonato 100 não encontrado", exception.getMessage());
 		
 	}
 	
@@ -54,7 +54,7 @@ public class CampeonatoServiceTest extends BaseTests{
 	@Test
 	@DisplayName("Teste incluir campeonato")
 	void insertCampeonatoTest() {
-		Campeonato user = new Campeonato(null,"nome",2000);
+		Campeonato user = new Campeonato(1,"nome",2000);
 		campeonatoService.salvar(user);
 		assertThat(user).isNotNull();
 		user = campeonatoService.findById(1);
@@ -140,7 +140,7 @@ public class CampeonatoServiceTest extends BaseTests{
 	    Campeonato savedCampeonato = campeonatoService.salvar(campeonato);
 	    assertEquals("nome", savedCampeonato.getDescricao());
 
-	    assertEquals( 2, savedCampeonato.getId());
+	    assertEquals(2, savedCampeonato.getId());
 	    assertEquals("nome" , savedCampeonato.getDescricao());
 	}
 

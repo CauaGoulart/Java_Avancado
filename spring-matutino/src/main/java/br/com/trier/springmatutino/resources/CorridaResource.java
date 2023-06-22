@@ -1,6 +1,5 @@
 package br.com.trier.springmatutino.resources;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +64,8 @@ public class CorridaResource {
     }
     
     @GetMapping("/name/{name}")
-	public ResponseEntity<List<CorridaDTO>> buscarPorData(@PathVariable LocalDateTime date){
-        return ResponseEntity.ok(service.findByDate(date).stream().map((corrida) -> corrida.toDto()).toList());
+	public ResponseEntity<List<CorridaDTO>> buscarPorData(@PathVariable Integer date){
+        return ResponseEntity.ok(service.findByAnoCampeonato(date).stream().map((corrida) -> corrida.toDto()).toList());
 	}
     
     @GetMapping("/pista/{idPista}")

@@ -56,8 +56,7 @@ public class PilotoServiceTest extends BaseTests{
 	@Test
 	@DisplayName("Teste listar todos")
 	@Sql({"classpath:/resources/sqls/limpa_tabelas_piloto.sql"})
-	@Sql({"classpath:/resourcestestes/sqls/pais.sql"})
-	@Sql({"classpath:/resourcestestes/sqls/piloto.sql"})
+	@Sql({"classpath:/resources/sqls/piloto.sql"})
 	void listAll() {
 		var lista = service.listAll();
 		assertEquals(2, lista.size());
@@ -87,7 +86,7 @@ public class PilotoServiceTest extends BaseTests{
 		paisService.salvar(pais);
 		Equipe equipe = new Equipe(null,"nome");
 		equipeService.salvar(equipe);
-		Piloto piloto = new Piloto(null,"nome",pais,equipe);		
+		Piloto piloto = new Piloto(1,"nome",pais,equipe);		
 		assertThat(piloto).isNotNull();
 		var pilotoTest = service.findById(1);
 		assertEquals(1, pilotoTest.getId());

@@ -32,7 +32,7 @@ public class PaisServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/pais.sql"})
 	void findByIdNonExistentTest() {
 		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> paisService.findById(10));
-		assertEquals("País 10 não encontrado", exception.getMessage());
+		assertEquals("Pais id 10 não existe", exception.getMessage());
 		
 	}
 	
@@ -47,11 +47,11 @@ public class PaisServiceTest extends BaseTests{
 	@Test
 	@DisplayName("Teste incluir pais")
 	void insertPaisTest() {
-		Pais pais = new Pais(null,"nome");
+		Pais pais = new Pais(3,"nome");
 		paisService.salvar(pais);
 		assertThat(pais).isNotNull();
-		pais = paisService.findById(1);
-		assertEquals(1, pais.getId());
+		pais = paisService.findById(3);
+		assertEquals(3, pais.getId());
 		assertEquals("nome", pais.getName());
 	}
 	
@@ -93,7 +93,7 @@ public class PaisServiceTest extends BaseTests{
 	@Sql({ "classpath:/resources/sqls/pais.sql" })
 	void deleteNonExistentUserTest() {
 		  var exception = assertThrows(ObjetoNaoEncontrado.class, () -> paisService.delete(10));
-		    assertEquals("País 10 não encontrado", exception.getMessage());
+		    assertEquals("Pais id 10 não existe", exception.getMessage());
 	}
 }
 

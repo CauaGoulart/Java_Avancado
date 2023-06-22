@@ -1,5 +1,6 @@
 package br.com.trier.springmatutino.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public class CampeonatoServiceImpl implements CampeonatoService{
 	public Campeonato salvar(Campeonato campeonato) {
 
 		    int ano = campeonato.getAno();
-		    if (ano < 1990 || ano > 2024) {
+		    if (ano < 1990 || ano  > LocalDateTime.now().getYear()+1) {
 		        throw new ViolacaoIntegridade("O ano do campeonato deve estar entre 1990 e 2023");
 		    }
 		    return repository.save(campeonato);

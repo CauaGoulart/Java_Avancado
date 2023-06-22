@@ -1,21 +1,25 @@
 package br.com.trier.springmatutino.domain.dto;
 
-import java.time.LocalDateTime;
-
 import br.com.trier.springmatutino.domain.Campeonato;
 import br.com.trier.springmatutino.domain.Pista;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class CorridaDTO {
 	
 	private Integer id;
-	private LocalDateTime date;
+	private Integer anoCampeonato;
 	private Pista pista;
 	private Campeonato campeonato;
+	
+	public CorridaDTO(Integer id, Integer anoCampeonato, Pista pista, Campeonato campeonato) {
+	    this.id = id;
+	    this.anoCampeonato = anoCampeonato;
+	    this.pista = pista;
+	    this.campeonato = campeonato;
+	}
+
 
 }
