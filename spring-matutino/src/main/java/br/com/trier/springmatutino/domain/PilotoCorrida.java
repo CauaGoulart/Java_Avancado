@@ -31,22 +31,15 @@ public class PilotoCorrida {
 	@ManyToOne
 	private Corrida corrida;
 	@Column
-	private String colocacao;
-	
-	public PilotoCorrida(PilotoCorridaDTO dto) {
-		this(dto.getId(), 
-			 new Piloto(dto.getPilotoId(), dto.getPilotoNome(), null, null),
-			 new Corrida(dto.getCorridaId(), DateUtils.strToZonedDateTime(dto.getCorridaData()), null, null),
-			 dto.getColocacao());
-	}
+	private Integer colocacao;
 	
 	public PilotoCorridaDTO toDTO() {
 		return new PilotoCorridaDTO(id, 
-									piloto.getId(), 
-									piloto.getName(), 
-									corrida.getId(), 
-									DateUtils.zonedDateTimeToStr(corrida.getData()), 
-									colocacao);
+					piloto.getId(), 
+					piloto.getName(), 
+					corrida.getId(), 
+					DateUtils.zonedDateTimeToStr(corrida.getData()), 
+					colocacao);
 	}
 	
 	public PilotoCorrida(PilotoCorridaDTO dto, Piloto piloto, Corrida corrida) {

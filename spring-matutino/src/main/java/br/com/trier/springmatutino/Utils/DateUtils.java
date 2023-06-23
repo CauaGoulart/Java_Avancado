@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
 	
-	private static DateTimeFormatter formatacao = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+	private static DateTimeFormatter formatacao = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
 	public static ZonedDateTime strToZonedDateTime(String dateStr) {
 		DateTimeFormatter formatacao = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

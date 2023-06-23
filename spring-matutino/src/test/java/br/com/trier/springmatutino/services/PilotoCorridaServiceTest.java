@@ -27,7 +27,7 @@ public class PilotoCorridaServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/limpa_tabelas_pilotocorrida.sql"})
 	void insertTest() {
 		var pilotoCorrida = new PilotoCorrida(null, new Piloto(1, null, null, null), new Corrida(1, null, null, null),
-				"Primeiro");
+				1);
 		service.insert(pilotoCorrida);
 		assertEquals(1, service.listAll().size());
 	}
@@ -48,7 +48,7 @@ public class PilotoCorridaServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/piloto_corrida.sql"})
 	void updateTest() {
 		var pilotoCorrida = new PilotoCorrida(1, new Piloto(1, null, null, null), new Corrida(1, null, null, null),
-				"Teste");
+				1);
 		service.update(pilotoCorrida);
 		assertEquals("Teste", service.listAll().get(0).getColocacao());
 	}
@@ -59,7 +59,7 @@ public class PilotoCorridaServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/piloto_corrida.sql"})
 	void updateInvalidTest() {
 		var pilotoCorrida = new PilotoCorrida(10, new Piloto(1, null, null, null), new Corrida(1, null, null, null),
-				"Teste");
+				1);
 		var exception = assertThrows(ObjetoNaoEncontrado.class, () -> service.update(pilotoCorrida));
 		assertEquals("Esse cadastro não existe", exception.getMessage());
 	}

@@ -28,7 +28,7 @@ public class PilotoCorridaServiceImpl implements PilotoCorridaService{
 	private void validaInsert(PilotoCorrida pilotoCorrida) {
 		if(pilotoCorrida == null) {
 			throw new ViolacaoIntegridade("O cadastro não pode ser nulo");
-		} else if(pilotoCorrida.getColocacao() == null || pilotoCorrida.getColocacao().isBlank()) {
+		} else if(pilotoCorrida.getColocacao() == null) {
 			throw new ViolacaoIntegridade("Preencha a colocação");
 		}
 	}

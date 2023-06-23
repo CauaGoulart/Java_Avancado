@@ -13,6 +13,6 @@ public class CorridaDTO {
 	private String data;
 	private Integer pistaId;
 	private Integer campeonatoId;
-	private String campeonatoNome;
+
 
 }

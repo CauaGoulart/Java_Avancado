@@ -39,8 +39,8 @@ public class Corrida {
 	public Corrida(CorridaDTO dto) {
 		this(dto.getId(), 
 			 DateUtils.strToZonedDateTime(dto.getData()), 
-			 new Pista(dto.getPistaId(), null, null), 
-			 new Campeonato(dto.getCampeonatoId(), dto.getCampeonatoNome(), null));
+			 new Pista(dto.getPistaId(), null, null,null), 
+			 new Campeonato(dto.getCampeonatoId(), null, null));
 	}
 	
 	public Corrida(CorridaDTO dto, Campeonato campeonato, Pista pista) {
@@ -48,6 +48,6 @@ public class Corrida {
 	}
 	
 	public CorridaDTO toDTO() {
-		return new CorridaDTO(id, DateUtils.zonedDateTimeToStr(data), pista.getId(), campeonato.getId(), campeonato.getDescricao());
+		return new CorridaDTO(id, DateUtils.zonedDateTimeToStr(data), pista.getId(), campeonato.getId());
 	}
 }

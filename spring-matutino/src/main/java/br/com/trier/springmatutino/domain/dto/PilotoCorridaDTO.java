@@ -14,5 +14,5 @@ public class PilotoCorridaDTO {
 	private String pilotoNome;
 	private Integer corridaId;
 	private String corridaData;
-	private String colocacao;
+	private Integer colocacao;
 }

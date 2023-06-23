@@ -31,19 +31,18 @@ public class PilotoCorridaResource {
 	private PilotoService pilotoService;
 	
 	@PostMapping
-	public ResponseEntity<PilotoCorridaDTO> insert(@RequestBody PilotoCorridaDTO pilotoCorridaDTO){
-		return ResponseEntity.ok(service.insert(new PilotoCorrida(
-													pilotoCorridaDTO, 
-													pilotoService.findById(pilotoCorridaDTO.getPilotoId()), 
-													corridaService.findById(pilotoCorridaDTO.getCorridaId()))).toDTO());
+	public ResponseEntity<PilotoCorridaDTO> insert(@RequestBody PilotoCorridaDTO pilotoCorridaDTO) {
+		return ResponseEntity.ok(service
+				.insert(new PilotoCorrida(pilotoCorridaDTO, pilotoService.findById(pilotoCorridaDTO.getPilotoId()),
+						corridaService.findById(pilotoCorridaDTO.getCorridaId())))
+				.toDTO());
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<PilotoCorridaDTO> update(@RequestBody PilotoCorridaDTO pilotoCorridaDTO, @PathVariable Integer id){
 		PilotoCorrida piloto = new PilotoCorrida(
-										pilotoCorridaDTO, 
-										pilotoService.findById(pilotoCorridaDTO.getPilotoId()), 
-										corridaService.findById(pilotoCorridaDTO.getCorridaId()));
+				pilotoCorridaDTO, pilotoService.findById(pilotoCorridaDTO.getPilotoId()),
+				corridaService.findById(pilotoCorridaDTO.getCorridaId()));
 		piloto.setId(id);
 		return ResponseEntity.ok(service.update(piloto).toDTO());
 	}
@@ -56,9 +55,7 @@ public class PilotoCorridaResource {
 	
 	@GetMapping
 	public ResponseEntity<List<PilotoCorridaDTO>> listAll(){
-		return ResponseEntity.ok(service.listAll().stream()
-											      .map((pilotoCorrida) -> pilotoCorrida.toDTO())
-											      .toList());
+		return ResponseEntity.ok(service.listAll().stream().map((pilotoCorrida) -> pilotoCorrida.toDTO()).toList());
 	}
 	
 	@GetMapping("/{id}")
@@ -68,17 +65,13 @@ public class PilotoCorridaResource {
 	
 	@GetMapping("/piloto/{pilotoId}")
 	public ResponseEntity<List<PilotoCorridaDTO>> findByPiloto(@PathVariable Integer pilotoId){
-		return ResponseEntity.ok(service.findByPiloto(
-									pilotoService.findById(pilotoId)).stream()
-																	 .map((pilotoCorrida) -> pilotoCorrida.toDTO())
-																	 .toList());
+		return ResponseEntity.ok(service.findByPiloto(pilotoService.findById(pilotoId)).stream()
+				.map((pilotoCorrida) -> pilotoCorrida.toDTO()).toList());
 	}
 
 	@GetMapping("/corrida/{corridaId}")
 	public ResponseEntity<List<PilotoCorridaDTO>> findByCorrida(@PathVariable Integer corridaId){
-		return ResponseEntity.ok(service.findByCorrida(
-									corridaService.findById(corridaId)).stream()
-																	   .map((pilotoCorrida) -> pilotoCorrida.toDTO())
-																	   .toList());
+		return ResponseEntity.ok(service.findByCorrida(corridaService.findById(corridaId)).stream()
+				.map((pilotoCorrida) -> pilotoCorrida.toDTO()).toList());
 	}
 }

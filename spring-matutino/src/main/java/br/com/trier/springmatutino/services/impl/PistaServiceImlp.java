@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.trier.springmatutino.domain.Pais;
+import br.com.trier.springmatutino.domain.Piloto;
 import br.com.trier.springmatutino.domain.Pista;
 import br.com.trier.springmatutino.repositories.PistaRepository;
 import br.com.trier.springmatutino.services.PistaService;
@@ -22,6 +23,11 @@ public class PistaServiceImlp implements PistaService {
 	
 		if (pista.getTamanho() == null || pista.getTamanho() <= 0) {
 			throw new ViolacaoIntegridade("Tamanho inválido");
+
+		}
+		
+		if (pista.getNome() == null) {
+			throw new ViolacaoIntegridade("Nome não pode estar vazio");
 
 		}
 	}
@@ -63,6 +69,16 @@ public class PistaServiceImlp implements PistaService {
 		return repository.findById(id).orElseThrow(() -> new ObjetoNaoEncontrado("Pista com id %s não existe".formatted(id)));
 
 	}
+	
+	@Override
+	public List<Piloto> findByNome(String nome) {
+		 List<Piloto> lista = repository.findByNome(nome);
+ 		if(lista.size()==0) {
+ 			throw new ObjetoNaoEncontrado("Nenhuma pista com o nome %s".formatted(nome));
+ 		}
+	return repository.findByNome(nome);
+
+}
 
 
 	@Override

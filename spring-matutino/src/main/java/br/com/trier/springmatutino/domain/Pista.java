@@ -25,6 +25,9 @@ public class Pista {
 	@Setter
 	private Integer id;
 	
+	@Column(name = "nome_pista")
+	private String nome;
+	
 	@Column(name = "tamanho_pista")
 	private Integer tamanho;
 	
