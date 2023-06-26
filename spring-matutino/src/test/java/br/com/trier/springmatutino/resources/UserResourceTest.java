@@ -6,12 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +32,6 @@ import br.com.trier.springmatutino.domain.dto.UserDTO;
 public class UserResourceTest {
 	@Autowired
 	protected TestRestTemplate rest;
-	
-	@Autowired
-	private AuthenticationManager authenticationManager;
 
 	private ResponseEntity<UserDTO> getUser(String url) {
 		return rest.getForEntity(url, UserDTO.class);
@@ -48,21 +39,12 @@ public class UserResourceTest {
 
 	@SuppressWarnings("unused")
 	private ResponseEntity<List<UserDTO>> getUsers(String url) {
-		String token = getToken();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> requestEntity = new HttpEntity<>(token, headers);
-		ResponseEntity<String> responseEntity = rest.exchange("/auth/token", HttpMethod.POST, requestEntity,
-				String.class);
+		String token = getToken();
+		headers.set("Authorization", "Bearer " + token);
 		return rest.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<UserDTO>>() {
 		});
-	}
-	
-	@BeforeEach
-	public void setup() {
-	    Authentication authentication = authenticationManager.authenticate(
-	            new UsernamePasswordAuthenticationToken("Cadastra", "Cadastra"));
-	    SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
 
 	@Test
@@ -77,7 +59,7 @@ public class UserResourceTest {
 		assertEquals("Usuario teste 1", user.getName());
 	}
 	
-	@Test
+	
 	@DisplayName("Obter Token")
 	@Sql({ "classpath: /resources/sqls/limpa_tabelas.sql" })
 	@Sql({ "classpath: /resources/sqls/usuario.sql" })
@@ -91,6 +73,21 @@ public class UserResourceTest {
 		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 		String token = responseEntity.getBody();
 		return token;
+	}
+	
+	@Test
+	@DisplayName("Teste Obter Token")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
+	@Sql({"classpath:/resources/sqls/usuario.sql"})
+	public void testGetToken() {
+		LoginDTO loginDTO = new LoginDTO("test2@teste.com.br", "123");
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
+		ResponseEntity<String> responseEntity = rest.exchange("/auth/token", HttpMethod.POST,
+				requestEntity, String.class);
+		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		
 	}
 
 	@Test
@@ -106,20 +103,21 @@ public class UserResourceTest {
 	@DisplayName("Cadastrar usuário")
 	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
 	public void testCreateUser() {
-	    UserDTO userDto = new UserDTO(null, "Cadastra", "Cadastra", "Cadastra", "ADMIN");
-
-	    HttpHeaders headers = new HttpHeaders();
-	    headers.setContentType(MediaType.APPLICATION_JSON);
-
-	    headers.setBearerAuth(token);
-
-	    HttpEntity<UserDTO> requestEntity = new HttpEntity<>(userDto, headers);
-	    ResponseEntity<UserDTO> responseEntity = rest.exchange("/usuario", HttpMethod.POST, requestEntity, UserDTO.class);
-
-	    assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-	    UserDTO user = responseEntity.getBody();
-	    assertThat(user).isNotNull();
-	    assertEquals("Cadastra", user.getName());
+		UserDTO dto = new UserDTO(null, "nome", "email", "senha", "ADMIN,USER");
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String token = getToken();
+		headers.set("Authorization", "Bearer " + token);
+		HttpEntity<UserDTO> requestEntity = new HttpEntity<>(dto, headers);
+		ResponseEntity<UserDTO> responseEntity = rest.exchange(
+	            "/user", 
+	            HttpMethod.POST,  
+	            requestEntity,    
+	            UserDTO.class   
+	    );
+		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		UserDTO user = responseEntity.getBody();
+		assertEquals("nome", user.getName());
 	}
 
 
