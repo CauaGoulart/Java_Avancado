@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import br.com.trier.springmatutino.SpringMatutinoApplication;
+import br.com.trier.springmatutino.config.jwt.LoginDTO;
 import br.com.trier.springmatutino.domain.dto.UserDTO;
 
 @ActiveProfiles("test")
@@ -46,6 +48,12 @@ public class UserResourceTest {
 
 	@SuppressWarnings("unused")
 	private ResponseEntity<List<UserDTO>> getUsers(String url) {
+		String token = getToken();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> requestEntity = new HttpEntity<>(token, headers);
+		ResponseEntity<String> responseEntity = rest.exchange("/auth/token", HttpMethod.POST, requestEntity,
+				String.class);
 		return rest.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<UserDTO>>() {
 		});
 	}
@@ -68,6 +76,22 @@ public class UserResourceTest {
 		UserDTO user = response.getBody();
 		assertEquals("Usuario teste 1", user.getName());
 	}
+	
+	@Test
+	@DisplayName("Obter Token")
+	@Sql({ "classpath: /resources/sqls/limpa_tabelas.sql" })
+	@Sql({ "classpath: /resources/sqls/usuario.sql" })
+	public String getToken() {
+		LoginDTO loginDTO = new LoginDTO("email1", "senha1");
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
+		ResponseEntity<String> responseEntity = rest.exchange("/auth/token", HttpMethod.POST, requestEntity,
+				String.class);
+		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		String token = responseEntity.getBody();
+		return token;
+	}
 
 	@Test
 	@DisplayName("Buscar por id inexistente")
@@ -87,8 +111,6 @@ public class UserResourceTest {
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.APPLICATION_JSON);
 
-	    JwtUtil jwtUtil = new JwtUtil();
-	    String token = jwtUtil.generateToken(userDto.getEmail());
 	    headers.setBearerAuth(token);
 
 	    HttpEntity<UserDTO> requestEntity = new HttpEntity<>(userDto, headers);
