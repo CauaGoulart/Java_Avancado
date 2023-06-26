@@ -20,8 +20,8 @@ public class UserServceImpl implements UserService {
 	
 	
 	private void findByEmail(User obj) {
-		User user = repository.findByEmail(obj.getEmail());
-		if(user != null && user.getId()!=obj.getId()) {
+		Optional<User> user = repository.findByEmail(obj.getEmail());
+		if(user != null && user.isEmpty()) {
 			throw new ViolacaoIntegridade("E-mail já cadastrado:%s".formatted(obj.getEmail()));
 		}
 		
@@ -60,13 +60,34 @@ public class UserServceImpl implements UserService {
 
 
 	@Override
-	public List<User> findByName(String name) {
-        List<User> lista = repository.findByName(name);
-        		if(lista.size()==0) {
+	public Optional<User> findByName(String name) {
+        Optional<User> lista = repository.findByName(name);
+        		if(lista.isEmpty()) {
         			throw new ObjetoNaoEncontrado("Nenhum nome de usuário inicia com %s".formatted(name));
         		}
 		return repository.findByName(name);
 
 	}
 
-}
+	@Override
+	public Optional<User> findByEmail(String email) {
+		Optional<User> lista = repository.findByEmail(email);
+		if (lista.isEmpty()) {
+			throw new ObjetoNaoEncontrado("Nenhum nome de usuário inicia com %s".formatted(email));
+		}
+		return repository.findByEmail(email);
+
+	}
+
+	@Override
+	public List<User> findByEmailAndPassword(String email, String password) {
+		List<User> lista = repository.findByEmailAndPassword(email,password);
+		if (lista.size() == 0) {
+			throw new ObjetoNaoEncontrado("Nenhum usuario encontrado");
+		}
+		return repository.findByEmailAndPassword(email,password);
+
+	}
+	}
+
+

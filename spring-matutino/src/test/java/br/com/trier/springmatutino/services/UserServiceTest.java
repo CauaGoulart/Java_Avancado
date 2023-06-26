@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
+import java.util.Optional;
+
 import br.com.trier.springmatutino.domain.User;
 import br.com.trier.springmatutino.services.exceptions.ObjetoNaoEncontrado;
 import br.com.trier.springmatutino.services.exceptions.ViolacaoIntegridade;
@@ -51,7 +53,7 @@ public class UserServiceTest extends BaseTests {
 	@Test
 	@DisplayName("Teste cadastrar usuario")
 	void salvar() {
-		User usuario = userService.salvar(new User(null, "teste", "teste123@teste.com.br", "123"));
+		User usuario = userService.salvar(new User(null, "teste", "teste123@teste.com.br", "123", "ADMIN"));
 		assertThat(usuario).isNotNull();
 		assertEquals(1, usuario.getId());
 		assertEquals("teste", usuario.getName());
@@ -62,8 +64,8 @@ public class UserServiceTest extends BaseTests {
 	@Test
 	@DisplayName("Teste cadastrar usuario com e-mail duplicado")
 	void salvarExistente() {
-		userService.salvar(new User(null, "teste", "teste@teste.com.br", "123"));
-		var exception = assertThrows(ViolacaoIntegridade.class, () -> userService.salvar(new User(null, "teste", "teste@teste.com.br", "123")));
+		userService.salvar(new User(null, "teste", "teste123@teste.com.br", "123", "ADMIN"));
+		var exception = assertThrows(ViolacaoIntegridade.class, () -> userService.salvar(new User(null, "teste", "teste123@teste.com.br", "123", "ADMIN")));
 		assertEquals("E-mail já cadastrado:teste@teste.com.br", exception.getMessage());
 	}
 	
@@ -71,7 +73,7 @@ public class UserServiceTest extends BaseTests {
 	@DisplayName("Teste update no usuario")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void updateUser() {
-		User usuario = userService.update(new User(2,"teste", "teste123@teste.com.br", "123"));
+		User usuario = userService.update(new User(null, "teste", "teste123@teste.com.br", "123", "ADMIN"));
 		assertThat(usuario).isNotNull();
 		var userTest = userService.findById(2);
 		assertEquals(2, userTest.getId());
@@ -84,7 +86,7 @@ public class UserServiceTest extends BaseTests {
 	@DisplayName("Update usuario com e-mail duplicado")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void updateUserEmailExistente() {
-		var exception = assertThrows(ViolacaoIntegridade.class, () -> userService.update(new User(2,"teste", "teste@teste.com.br", "123")));
+		var exception = assertThrows(ViolacaoIntegridade.class, () -> userService.update(new User(2, "teste", "teste123@teste.com.br", "123", "ADMIN")));
 		assertEquals("E-mail já cadastrado:teste@teste.com.br", exception.getMessage());
 	}
 	
@@ -107,12 +109,13 @@ public class UserServiceTest extends BaseTests {
 		assertEquals(2, lista.size());
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	@DisplayName("Teste buscar usuario por nome")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void findByName() {
-		List<User> lista = userService.findByName("Usuario teste 1");
-		assertEquals(1, lista.size());
+		Optional<User> lista = userService.findByName("Usuario teste 1");
+		assertEquals(1, lista.equals(1));
 	}
 	
 	@Test

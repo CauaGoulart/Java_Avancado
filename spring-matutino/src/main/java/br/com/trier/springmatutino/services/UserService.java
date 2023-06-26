@@ -1,6 +1,7 @@
 package br.com.trier.springmatutino.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import br.com.trier.springmatutino.domain.User;
 
@@ -11,6 +12,8 @@ public interface UserService {
 	User findById(Integer id);
     User update(User user);
     void delete(Integer id);
-    List<User> findByName(String name);
+    Optional<User> findByName(String name);
+    Optional<User> findByEmail(String email);
+	List<User> findByEmailAndPassword(String email,String password);
    
 }
