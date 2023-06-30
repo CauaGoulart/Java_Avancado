@@ -62,7 +62,7 @@ public class PistaServiceTest extends BaseTests{
 	void salvar() {
 		Pais pais = new Pais(null,"nome");
 		paisService.salvar(pais);
-		Pista pista = service.salvar(new Pista(null,2000,pais));
+		Pista pista = service.salvar(new Pista(null,"nome", 2000,pais));
 		assertThat(pista).isNotNull();
 		assertEquals(1, pista.getId());
 		assertEquals(2000, pista.getTamanho());
@@ -77,7 +77,7 @@ public class PistaServiceTest extends BaseTests{
 	void updatePista() {
 		Pais pais = new Pais(null,"nome");
 		paisService.salvar(pais);
-		Pista pista = service.salvar(new Pista(null,6000,pais));		
+		Pista pista = service.salvar(new Pista(null,"nome", 6000,pais));		
 		assertThat(pista).isNotNull();
 		var pistaTest = service.findById(1);
 		assertEquals(1, pistaTest.getId());

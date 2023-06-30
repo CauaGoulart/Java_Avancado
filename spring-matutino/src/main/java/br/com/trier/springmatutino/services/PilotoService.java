@@ -14,7 +14,7 @@ public interface PilotoService {
 	List<Piloto> findByName(String name);
 	List<Piloto> findByPais(Pais pais);
 	List<Piloto> findByEquipe(Equipe equipe);
-	Piloto update(Piloto pais);
+	Piloto update(Piloto piloto);
     void delete(Integer id);
 
 }

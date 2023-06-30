@@ -22,7 +22,7 @@ public class UserServceImpl implements UserService {
 	private void findByEmail(User obj) {
 		Optional<User> user = repository.findByEmail(obj.getEmail());
 		if(user != null && user.isEmpty()) {
-			throw new ViolacaoIntegridade("E-mail já cadastrado:%s".formatted(obj.getEmail()));
+			throw new ViolacaoIntegridade("E-mail não encontrado:%s".formatted(obj.getEmail()));
 		}
 		
 	}

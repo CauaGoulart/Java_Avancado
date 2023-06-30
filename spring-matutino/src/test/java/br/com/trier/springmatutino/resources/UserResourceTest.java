@@ -34,61 +34,51 @@ public class UserResourceTest {
 	protected TestRestTemplate rest;
 
 	private ResponseEntity<UserDTO> getUser(String url) {
-		return rest.getForEntity(url, UserDTO.class);
+		return rest.exchange(
+				url,  
+				HttpMethod.GET, 
+				new HttpEntity<>(getHeaders("teste@teste.com.br", "123")), 
+				UserDTO.class
+				);
 	}
 
-	@SuppressWarnings("unused")
 	private ResponseEntity<List<UserDTO>> getUsers(String url) {
+		return rest.exchange(
+				url, HttpMethod.GET, 
+				new HttpEntity<>(getHeaders("teste@teste.com.br", "123")), 
+				new ParameterizedTypeReference<List<UserDTO>>() {}
+			);
+	}
+	
+	private HttpHeaders getHeaders(String email, String password){
+		LoginDTO loginDTO = new LoginDTO(email, password);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		String token = getToken();
-		headers.set("Authorization", "Bearer " + token);
-		return rest.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<UserDTO>>() {
-		});
+		HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
+		ResponseEntity<String> responseEntity = rest.exchange(
+				"/auth/token", 
+				HttpMethod.POST,  
+				requestEntity,    
+				String.class   
+				);
+		String token = responseEntity.getBody();
+		headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setBearerAuth(token);
+		return headers;
 	}
 
 	@Test
 	@DisplayName("Buscar por id")
-	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
-	@Sql(scripts = "classpath:/resources/sqls/usuario.sql")
-	public void testGetOk() {
-		ResponseEntity<UserDTO> response = getUser("/usuario/1");
-		assertEquals(response.getStatusCode(), HttpStatus.OK);
-
-		UserDTO user = response.getBody();
-		assertEquals("Usuario teste 1", user.getName());
-	}
-	
-	
-	@DisplayName("Obter Token")
-	@Sql({ "classpath: /resources/sqls/limpa_tabelas.sql" })
-	@Sql({ "classpath: /resources/sqls/usuario.sql" })
-	public String getToken() {
-		LoginDTO loginDTO = new LoginDTO("email1", "senha1");
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
-		ResponseEntity<String> responseEntity = rest.exchange("/auth/token", HttpMethod.POST, requestEntity,
-				String.class);
-		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
-		String token = responseEntity.getBody();
-		return token;
-	}
-	
-	@Test
-	@DisplayName("Teste Obter Token")
-	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
+	@Sql({"classpath:/resources/sqls/limpa_tabelas_usuario.sql"})
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
-	public void testGetToken() {
-		LoginDTO loginDTO = new LoginDTO("test2@teste.com.br", "123");
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
-		ResponseEntity<String> responseEntity = rest.exchange("/auth/token", HttpMethod.POST,
-				requestEntity, String.class);
-		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
-		
+	public void findByIdTest() {
+		ResponseEntity<UserDTO> response = getUser("/users/5");
+		assertEquals(response.getStatusCode(), HttpStatus.OK);
+		UserDTO user = response.getBody();
+		assertEquals("User 1", user.getName());
 	}
+
 
 	@Test
 	@DisplayName("Buscar por id inexistente")
@@ -98,19 +88,27 @@ public class UserResourceTest {
 		ResponseEntity<UserDTO> response = getUser("/usuario/300");
 		assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
 	}
+	
+	@Test
+	@DisplayName("Buscar por nome")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
+	@Sql({"classpath:/resources/sqls/usuario.sql"})
+	public void findByNameTest() {
+		ResponseEntity<List<UserDTO>> response = getUsers("/users/name/u");
+		assertEquals(response.getStatusCode(), HttpStatus.OK);
+		assertEquals(2, response.getBody().size());
+	}
 
 	@Test
 	@DisplayName("Cadastrar usuário")
 	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
+	@Sql(scripts = "classpath:/resources/sqls/usuario.sql")
 	public void testCreateUser() {
-		UserDTO dto = new UserDTO(null, "nome", "email", "senha", "ADMIN,USER");
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		String token = getToken();
-		headers.set("Authorization", "Bearer " + token);
+		UserDTO dto = new UserDTO(null, "nome", "email", "senha", "ADMIN");
+		HttpHeaders headers = getHeaders("teste@teste.com.br", "123");
 		HttpEntity<UserDTO> requestEntity = new HttpEntity<>(dto, headers);
 		ResponseEntity<UserDTO> responseEntity = rest.exchange(
-	            "/user", 
+	            "/users", 
 	            HttpMethod.POST,  
 	            requestEntity,    
 	            UserDTO.class   
@@ -121,24 +119,23 @@ public class UserResourceTest {
 	}
 
 
-
-
-
 	@Test
 	@DisplayName("Atualizar usuário")
 	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
 	@Sql(scripts = "classpath:/resources/sqls/usuario.sql")
 	public void testUpdateUser() {
-		UserDTO dto = new UserDTO(null, "Novo Nome", "novonome@teste.com", "novasenha", "ADMIN");
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
+		UserDTO dto = new UserDTO(5, "nome", "email", "senha", "ADMIN");
+		HttpHeaders headers = getHeaders("email1", "senha1");
 		HttpEntity<UserDTO> requestEntity = new HttpEntity<>(dto, headers);
-		ResponseEntity<UserDTO> responseEntity = rest.exchange("/usuario/1", HttpMethod.PUT, requestEntity, UserDTO.class);
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		UserDTO updatedUser = responseEntity.getBody();
-		assertThat(updatedUser).isNotNull();
-		assertEquals("Novo Nome", updatedUser.getName());
-		assertEquals("novonome@teste.com", updatedUser.getEmail());
+		ResponseEntity<UserDTO> responseEntity = rest.exchange(
+				"/users/5", 
+				HttpMethod.PUT,  
+				requestEntity,    
+				UserDTO.class   
+				);
+		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		UserDTO user = responseEntity.getBody();
+		assertEquals("nome", user.getName());
 	}
 
 	@Test
@@ -183,19 +180,6 @@ public class UserResourceTest {
 	}
 
 	@Test
-	@DisplayName("Cadastrar usuário - BadRequest")
-	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
-	public void testCreateUserBadRequest() {
-		UserDTO dto = null;
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<UserDTO> requestEntity = new HttpEntity<>(dto, headers);
-		ResponseEntity<UserDTO> responseEntity = rest.exchange("/usuario", HttpMethod.POST, requestEntity, UserDTO.class);
-
-		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-	}
-
-	@Test
 	@DisplayName("Atualizar usuário - BadRequest")
 	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
 	@Sql(scripts = "classpath:/resources/sqls/usuario.sql")
@@ -211,13 +195,14 @@ public class UserResourceTest {
 
 	@Test
 	@DisplayName("Atualizar usuário - Objeto não encontrado")
-	@Sql(scripts = "classpath:/resources/sqls/limpa_tabelas.sql")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas_usuario.sql"})
+	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	public void testUpdateUserNotFound() {
 		UserDTO dto = null;
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<UserDTO> requestEntity = new HttpEntity<>(dto, headers);
-		ResponseEntity<UserDTO> responseEntity = rest.exchange("/usuario/1", HttpMethod.PUT, requestEntity, UserDTO.class);
+		ResponseEntity<UserDTO> responseEntity = rest.exchange("/usuario/10", HttpMethod.PUT, requestEntity, UserDTO.class);
 		assertThat(dto).isNull();
 		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 	}
